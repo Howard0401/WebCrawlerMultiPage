@@ -25,12 +25,13 @@ app = Flask(__name__)
 name = ''
 s = ''
 
-def run_time(func):         #使用run_time封裝這個方法 依序列出各執行序的執行時間
-    #*args: positional arguments #**kw: keyword arguments
+
+def run_time(func):  # 使用run_time封裝這個方法 依序列出各執行序的執行時間
+    # *args: positional arguments #**kw: keyword arguments
     def wrapper(*args, **kw):  # (*args:可以輸入任意長度list, #**kw: 輸入項會變成字典的儲存格式)
-        start = time.time() #開始時間(年月日)
+        start = time.time()  # 開始時間(年月日)
         func(*args, **kw)
-        end = time.time()   #結束時間
+        end = time.time()  # 結束時間
         # print('running', end - start, 's')
     return wrapper
 
@@ -43,6 +44,7 @@ class makeProp:
         self.store = list()
         self.price = list()
 
+
 class Spider():
     def __init__(self):
         self.qurl = Queue()
@@ -52,8 +54,8 @@ class Spider():
         self.name = ""
         self.proName = list()
         self.img = list()
-        self.href = list() 
-        self.store =list()
+        self.href = list()
+        self.store = list()
         self.price = list()
 
     def produce_url(self, name):
@@ -73,35 +75,38 @@ class Spider():
             }
             r = requests.get(url, headers=headers)
             soup = BeautifulSoup(r.text, 'html.parser')
-            selaa = soup.select("ul#product_list > li.mod_table > a.img_container")
-            selab = soup.select("li.mod_table > a.product_link > div > img.imgd4")
+            selaa = soup.select(
+                "ul#product_list > li.mod_table > a.img_container")
+            selab = soup.select(
+                "li.mod_table > a.product_link > div > img.imgd4")
 
             for n in selaa:
-                    self.proName.append(n.get('title'))
-                    self.price.append(n.get('data-price'))
-                    self.href.append(n.get('href'))
-                    self.store.append(n.get('data-store'))
+                self.proName.append(n.get('title'))
+                self.price.append(n.get('data-price'))
+                self.href.append(n.get('href'))
+                self.store.append(n.get('data-store'))
             for n in selab:
-                    self.img.append(n.get('src'))
+                self.img.append(n.get('src'))
 
             # print('pro:',len(self.proName),'\n')
             # print('price:', len(self.price), '\n')
             # print('href', len(self.href), '\n')
             # print('store', len(self.store), '\n')
             # print('img', len(self.img), '\n')
-            self.data = {"productName": self.proName, "price": self.price, "href":self.href, "store": self.store , "Img": self.img }
+            self.data = {"productName": self.proName, "price": self.price,
+                         "href": self.href, "store": self.store, "Img": self.img}
 
     @run_time
     def run(self, name):
         self.produce_url(name)
         ths = []
-        for _ in range(self.thread_num): #迴圈執行"執行緒總數"的循環次數
+        for _ in range(self.thread_num):  # 迴圈執行"執行緒總數"的循環次數
             th = Thread(target=self.get_info)  # 把執行每個url後爬蟲後的工作，分派給每個執行緒
             th.start()
             ths.append(th)
         for th in ths:
             th.join()  # Wait until the thread terminates.
-            try: #執行緒任務結束後 就不要他了 如檢查後還沒結束就報錯
+            try:  # 執行緒任務結束後 就不要他了 如檢查後還沒結束就報錯
                 # if the thread is still alive, the join() call timed out.
                 th.is_alive() == False
             except:
@@ -122,11 +127,15 @@ def test():
     global name
     name = data['name']
     Spider().run(name)
-    return s
+    global s
+    s = json.loads(s)
+    return jsonify(s)
+
 
 @app.route('/', methods=['GET'])
 def getDisplay():
     return "Please Use Post Method ====>  Format: {\"name\": \"YourSearchItem\"}"
+
 
 @app.errorhandler(404)
 def notFound(error):
