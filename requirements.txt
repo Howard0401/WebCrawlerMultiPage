@@ -1,0 +1,10 @@
+aiohttp
+async-timeout==3.0.1
+asyncio
+bs4
+celery
+flask
+pandas
+urllib3
+requests
+gunicorn
