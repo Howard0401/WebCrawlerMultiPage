@@ -79,15 +79,18 @@ class Spider():
                 "ul#product_list > li.mod_table > a.img_container")
             selab = soup.select(
                 "li.mod_table > a.product_link > div > img.imgd4")
-
+            selcc = soup.select(
+                "div.shop_container > a.product_link > div.shop > img")
+            # print(selcc)
             for n in selaa:
                 self.proName.append(n.get('title'))
                 self.price.append(n.get('data-price'))
                 self.href.append(n.get('href'))
-                self.store.append(n.get('data-store'))
+                # self.store.append(n.get('data-store'))
             for n in selab:
                 self.img.append(n.get('src'))
-
+            for n in selcc:
+                self.store.append(n.get('src'))
             # print('pro:',len(self.proName),'\n')
             # print('price:', len(self.price), '\n')
             # print('href', len(self.href), '\n')
